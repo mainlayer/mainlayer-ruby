@@ -1,0 +1,67 @@
+require:
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.7
+  Exclude:
+    - "vendor/**/*"
+    - "bin/**/*"
+
+# Style
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Style/Documentation:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never
+
+# Layout
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns:
+    - "^\\s*#"
+    - "spec\\.metadata"
+
+# Metrics
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - "spec/**/*"
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+    - "mainlayer.gemspec"
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Exclude:
+    - "spec/**/*"
+
+# RSpec
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/MessageExpectation:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
