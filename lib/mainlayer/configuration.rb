@@ -9,13 +9,13 @@ module Mainlayer
   # @example Global configuration
   #   Mainlayer.configure do |config|
   #     config.api_key     = "ml_live_..."
-  #     config.base_url    = "https://api.mainlayer.xyz"
+  #     config.base_url    = "https://api.mainlayer.fr"
   #     config.timeout     = 30
   #     config.max_retries = 3
   #   end
   class Configuration
     # Default API base URL.
-    DEFAULT_BASE_URL    = "https://api.mainlayer.xyz"
+    DEFAULT_BASE_URL    = "https://api.mainlayer.fr"
 
     # Default open/read timeout in seconds.
     DEFAULT_TIMEOUT     = 30
@@ -56,7 +56,7 @@ module Mainlayer
       raise AuthenticationError,
             "No API key provided. Set your API key via `Mainlayer.configure` " \
             "or pass `api_key:` to Mainlayer::Client.new. " \
-            "Your API key is available at https://mainlayer.xyz/dashboard."
+            "Your API key is available at https://mainlayer.fr/dashboard."
     end
   end
 end

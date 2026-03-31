@@ -1,6 +1,6 @@
 # Mainlayer Ruby SDK
 
-Official Ruby gem for [Mainlayer](https://mainlayer.xyz) — payment infrastructure for AI agents.
+Official Ruby gem for [Mainlayer](https://mainlayer.fr) — payment infrastructure for AI agents.
 
 [![Gem Version](https://badge.fury.io/rb/mainlayer.svg)](https://badge.fury.io/rb/mainlayer)
 [![CI](https://github.com/mainlayer/mainlayer-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/mainlayer/mainlayer-ruby/actions/workflows/ci.yml)
@@ -84,7 +84,7 @@ client = Mainlayer::Client.new(
   api_key:     "ml_live_...",
   timeout:     60,
   max_retries: 5,
-  base_url:    "https://api.mainlayer.xyz"  # override for staging, etc.
+  base_url:    "https://api.mainlayer.fr"  # override for staging, etc.
 )
 ```
 

@@ -38,7 +38,7 @@ end
 # @param body [Hash] response body to return
 # @param status [Integer] HTTP status code
 def stub_mainlayer(method, path, body: {}, status: 200)
-  stub_request(method, "https://api.mainlayer.xyz#{path}")
+  stub_request(method, "https://api.mainlayer.fr#{path}")
     .to_return(
       status:  status,
       body:    body.to_json,

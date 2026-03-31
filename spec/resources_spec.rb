@@ -44,7 +44,7 @@ RSpec.describe "Resource wrappers" do
       end
 
       it "includes optional description when provided" do
-        stub_request(:post, "https://api.mainlayer.xyz/resources")
+        stub_request(:post, "https://api.mainlayer.fr/resources")
           .with(body: hash_including("description" => "My AI tool"))
           .to_return(status: 200, body: RESOURCE_FIXTURE.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -56,7 +56,7 @@ RSpec.describe "Resource wrappers" do
       end
 
       it "includes optional callback_url when provided" do
-        stub_request(:post, "https://api.mainlayer.xyz/resources")
+        stub_request(:post, "https://api.mainlayer.fr/resources")
           .with(body: hash_including("callback_url" => "https://example.com/hook"))
           .to_return(status: 200, body: RESOURCE_FIXTURE.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -122,7 +122,7 @@ RSpec.describe "Resource wrappers" do
 
     describe "#update" do
       it "PATCH /resources/:id with given params" do
-        stub = stub_request(:patch, "https://api.mainlayer.xyz/resources/res_abc123")
+        stub = stub_request(:patch, "https://api.mainlayer.fr/resources/res_abc123")
           .with(body: hash_including("price_usdc" => 0.20))
           .to_return(status: 200, body: RESOURCE_FIXTURE.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -160,7 +160,7 @@ RSpec.describe "Resource wrappers" do
 
     describe "#create" do
       it "POST /pay with resource_id and payer_wallet" do
-        stub = stub_request(:post, "https://api.mainlayer.xyz/pay")
+        stub = stub_request(:post, "https://api.mainlayer.fr/pay")
           .with(body: hash_including("resource_id" => "res_abc123", "payer_wallet" => "wallet_addr"))
           .to_return(status: 200, body: PAYMENT_FIXTURE.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -189,7 +189,7 @@ RSpec.describe "Resource wrappers" do
 
     describe "#check" do
       it "GET /entitlements/check with correct params" do
-        stub = stub_request(:get, "https://api.mainlayer.xyz/entitlements/check")
+        stub = stub_request(:get, "https://api.mainlayer.fr/entitlements/check")
           .with(query: { "resource_id" => "res_abc123", "payer_wallet" => "wallet_addr" })
           .to_return(status: 200, body: ENTITLEMENT_FIXTURE.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -209,7 +209,7 @@ RSpec.describe "Resource wrappers" do
 
     describe "#search" do
       it "GET /discover with default limit" do
-        stub = stub_request(:get, "https://api.mainlayer.xyz/discover")
+        stub = stub_request(:get, "https://api.mainlayer.fr/discover")
           .with(query: hash_including("limit" => "20"))
           .to_return(status: 200, body: [RESOURCE_FIXTURE].to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -219,7 +219,7 @@ RSpec.describe "Resource wrappers" do
       end
 
       it "passes query params to /discover" do
-        stub = stub_request(:get, "https://api.mainlayer.xyz/discover")
+        stub = stub_request(:get, "https://api.mainlayer.fr/discover")
           .with(query: hash_including("q" => "weather", "type" => "api", "limit" => "5"))
           .to_return(status: 200, body: [RESOURCE_FIXTURE].to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -229,7 +229,7 @@ RSpec.describe "Resource wrappers" do
       end
 
       it "omits blank optional params" do
-        stub = stub_request(:get, "https://api.mainlayer.xyz/discover")
+        stub = stub_request(:get, "https://api.mainlayer.fr/discover")
           .with(query: { "limit" => "20" })
           .to_return(status: 200, body: [].to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -264,7 +264,7 @@ RSpec.describe "Resource wrappers" do
     describe "#create" do
       it "POST /webhooks with url and events" do
         body = { "id" => "wh_001", "url" => "https://example.com/hook", "events" => ["payment.succeeded"] }
-        stub = stub_request(:post, "https://api.mainlayer.xyz/webhooks")
+        stub = stub_request(:post, "https://api.mainlayer.fr/webhooks")
           .with(body: hash_including("url" => "https://example.com/hook"))
           .to_return(status: 200, body: body.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -293,7 +293,7 @@ RSpec.describe "Resource wrappers" do
     describe "#login" do
       it "POST /auth/login and returns access_token" do
         body = { "access_token" => "token_abc" }
-        stub = stub_request(:post, "https://api.mainlayer.xyz/auth/login")
+        stub = stub_request(:post, "https://api.mainlayer.fr/auth/login")
           .with(body: hash_including("email" => "me@example.com", "password" => "s3cr3t"))
           .to_return(status: 200, body: body.to_json,
                      headers: { "Content-Type" => "application/json" })
@@ -313,7 +313,7 @@ RSpec.describe "Resource wrappers" do
     describe "#create" do
       it "POST /api-keys with name" do
         body = { "id" => "key_001", "name" => "production", "key" => "ml_live_abc" }
-        stub = stub_request(:post, "https://api.mainlayer.xyz/api-keys")
+        stub = stub_request(:post, "https://api.mainlayer.fr/api-keys")
           .with(body: hash_including("name" => "production"))
           .to_return(status: 200, body: body.to_json,
                      headers: { "Content-Type" => "application/json" })

@@ -46,8 +46,8 @@ RSpec.describe Mainlayer::Client do
     end
 
     it "applies custom base_url" do
-      client = described_class.new(api_key: "ml_test", base_url: "https://staging.mainlayer.xyz")
-      expect(client.config.base_url).to eq("https://staging.mainlayer.xyz")
+      client = described_class.new(api_key: "ml_test", base_url: "https://staging.mainlayer.fr")
+      expect(client.config.base_url).to eq("https://staging.mainlayer.fr")
     end
   end
 
@@ -119,7 +119,7 @@ RSpec.describe Mainlayer::Client do
 
       # Disable retry middleware so we don't retry in tests
       allow_any_instance_of(Faraday::Connection).to receive(:get).and_call_original
-      stub_request(:get, "https://api.mainlayer.xyz/resources")
+      stub_request(:get, "https://api.mainlayer.fr/resources")
         .to_return(status: 429, body: { "message" => "Rate limited" }.to_json,
                    headers: { "Content-Type" => "application/json" })
         .times(4) # initial + 3 retries
@@ -129,7 +129,7 @@ RSpec.describe Mainlayer::Client do
 
     it "raises APIError on 500" do
       stub_mainlayer(:get, "/resources", body: { "message" => "Server error" }, status: 500)
-      stub_request(:get, "https://api.mainlayer.xyz/resources")
+      stub_request(:get, "https://api.mainlayer.fr/resources")
         .to_return(status: 500, body: { "message" => "Server error" }.to_json,
                    headers: { "Content-Type" => "application/json" })
         .times(4) # initial + 3 retries
@@ -161,7 +161,7 @@ RSpec.describe Mainlayer::Client do
     end
 
     it "raises ConnectionError on network failure" do
-      stub_request(:get, "https://api.mainlayer.xyz/resources")
+      stub_request(:get, "https://api.mainlayer.fr/resources")
         .to_raise(Faraday::ConnectionFailed.new("Connection refused"))
 
       expect { client.resources.list }.to raise_error(Mainlayer::ConnectionError)
@@ -179,7 +179,7 @@ RSpec.describe Mainlayer::Client do
 
     it "sends the correct User-Agent" do
       stub_mainlayer(:get, "/resources", body: [])
-      stub_with_ua = stub_request(:get, "https://api.mainlayer.xyz/resources")
+      stub_with_ua = stub_request(:get, "https://api.mainlayer.fr/resources")
         .with(headers: { "User-Agent" => /mainlayer-ruby\/#{Mainlayer::VERSION}/ })
         .to_return(status: 200, body: [].to_json,
                    headers: { "Content-Type" => "application/json" })

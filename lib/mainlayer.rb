@@ -43,7 +43,7 @@ require_relative "mainlayer/client"
 #   client = Mainlayer::Client.new(api_key: 'ml_live_...')
 #
 # @see Mainlayer::Client
-# @see https://docs.mainlayer.xyz Mainlayer API documentation
+# @see https://docs.mainlayer.fr Mainlayer API documentation
 module Mainlayer
   class << self
     # The global SDK configuration.
