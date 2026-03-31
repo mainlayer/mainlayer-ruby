@@ -56,6 +56,12 @@ module Mainlayer
       @api_keys ||= Resources::ApiKeysResource.new(self)
     end
 
+    # Access vendor registration operations.
+    # @return [Mainlayer::Resources::VendorsResource]
+    def vendors
+      @vendors ||= Resources::VendorsResource.new(self)
+    end
+
     # Access resource CRUD operations.
     # @return [Mainlayer::Resources::ResourcesResource]
     def resources
@@ -66,6 +72,12 @@ module Mainlayer
     # @return [Mainlayer::Resources::PaymentsResource]
     def payments
       @payments ||= Resources::PaymentsResource.new(self)
+    end
+
+    # Access subscription operations.
+    # @return [Mainlayer::Resources::SubscriptionsResource]
+    def subscriptions
+      @subscriptions ||= Resources::SubscriptionsResource.new(self)
     end
 
     # Access entitlement check operations.
@@ -121,6 +133,15 @@ module Mainlayer
     # @return [Hash] parsed JSON response body
     def patch(path, body = {})
       request(:patch, path, body: body)
+    end
+
+    # Send an authenticated PUT request.
+    #
+    # @param path [String] API path
+    # @param body [Hash] request body (serialised to JSON)
+    # @return [Hash] parsed JSON response body
+    def put(path, body = {})
+      request(:put, path, body: body)
     end
 
     # Send an authenticated DELETE request.

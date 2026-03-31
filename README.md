@@ -4,8 +4,18 @@ Official Ruby gem for [Mainlayer](https://mainlayer.fr) — payment infrastructu
 
 [![Gem Version](https://badge.fury.io/rb/mainlayer.svg)](https://badge.fury.io/rb/mainlayer)
 [![CI](https://github.com/mainlayer/mainlayer-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/mainlayer/mainlayer-ruby/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-mainlayer.fr-blue.svg)](https://docs.mainlayer.fr)
 
 Mainlayer lets you monetize AI tools and agents with one API. Accept payments, gate access, and manage subscriptions — without writing any payment infrastructure yourself.
+
+**Features:**
+- Create and manage monetizable resources
+- Accept one-time and subscription payments
+- Check access entitlements in real-time
+- Search the public marketplace
+- Manage webhooks and analytics
+- Automatic retry logic with exponential backoff
 
 ---
 
@@ -27,6 +37,8 @@ Requires Ruby 2.7+.
 
 ## Quick start
 
+### Vendor: Create and Monetize a Resource
+
 ```ruby
 require "mainlayer"
 
@@ -37,28 +49,49 @@ end
 
 client = Mainlayer::Client.new
 
-# Create a paid resource
+# 1. Create a paid resource
 resource = client.resources.create(
-  slug:        "my-ai-tool",
+  slug:        "my-ai-summarizer",
   type:        "api",
-  price_usdc:  0.10,
+  price_usdc:  0.05,
   fee_model:   "pay_per_call",
-  description: "My AI tool"
+  description: "Summarize any text with GPT-4"
 )
 
-# Accept a payment
+puts "Resource ID: #{resource['id']}"
+
+# 2. Activate the resource for payments
+client.resources.activate(resource["id"])
+
+# 3. Get webhook secret for payment notifications
+webhook_secret = client.resources.webhook_secret(resource["id"])
+puts "Webhook secret: #{webhook_secret['secret']}"
+```
+
+### Buyer: Accept Payment and Verify Access
+
+```ruby
+# 1. Accept a payment
 payment = client.payments.create(
-  resource_id:  resource["id"],
-  payer_wallet: "payer_wallet_address"
+  resource_id:  "res_abc123",
+  payer_wallet: "buyer_wallet_address"
 )
 
-# Verify access before serving a request
+puts "Payment status: #{payment['status']}"
+
+# 2. Verify access before serving a request
 access = client.entitlements.check(
-  resource_id:  resource["id"],
-  payer_wallet: "payer_wallet_address"
+  resource_id:  "res_abc123",
+  payer_wallet: "buyer_wallet_address"
 )
 
-puts access["has_access"] # => true
+if access["has_access"]
+  puts "Access granted!"
+  puts "Expires: #{access['expires_at']}"
+  puts "Credits remaining: #{access['credits_remaining']}"
+else
+  puts "Payment required"
+end
 ```
 
 ---
@@ -94,6 +127,15 @@ client = Mainlayer::Client.new(
 
 ### Authentication
 
+#### Register
+
+Create a new account.
+
+```ruby
+result = client.auth.register(email: "you@example.com", password: "your_password")
+token  = result["access_token"]
+```
+
 #### Login
 
 Exchange email/password for an access token.
@@ -101,6 +143,22 @@ Exchange email/password for an access token.
 ```ruby
 result = client.auth.login(email: "you@example.com", password: "your_password")
 token  = result["access_token"]
+```
+
+### Vendors
+
+#### Register with Wallet
+
+Register as a vendor with wallet signature authentication.
+
+```ruby
+vendor = client.vendors.register(
+  wallet_address: "0x...",
+  nonce:          "unique_nonce",
+  signed_message: "0x..."
+)
+puts vendor["id"]   # => vendor_xyz789
+puts vendor["verified"]  # => true
 ```
 
 ### API Keys
@@ -169,6 +227,59 @@ client.resources.update("res_abc123", price_usdc: 0.20, description: "Updated de
 client.resources.delete("res_abc123")
 ```
 
+#### Activate
+
+Make a resource live and eligible for payments.
+
+```ruby
+client.resources.activate("res_abc123")
+```
+
+#### Quota
+
+View or update credit quota for a resource.
+
+```ruby
+# Get current quota
+quota = client.resources.quota("res_abc123")
+puts quota["available_credits"]
+
+# Update quota
+client.resources.quota("res_abc123", available_credits: 1000)
+```
+
+#### Webhook Secret
+
+Get or rotate the webhook secret used to verify payment notifications.
+
+```ruby
+secret = client.resources.webhook_secret("res_abc123")
+puts secret["secret"]  # store securely and verify HMAC on incoming webhooks
+```
+
+#### Plans (Subscriptions)
+
+Create and manage subscription plans.
+
+```ruby
+# List all plans
+plans = client.resources.plans("res_abc123")
+
+# Create a new plan
+plan = client.resources.create_plan(
+  "res_abc123",
+  interval:       "month",
+  interval_count: 1,
+  price_usdc:     9.99
+)
+
+# Update a plan
+client.resources.update_plan("res_abc123", "plan_abc123", price_usdc: 11.99)
+
+# Delete a plan
+client.resources.delete_plan("res_abc123", "plan_abc123")
+```
+
 ---
 
 ### Payments
@@ -187,6 +298,41 @@ puts payment["status"]  # => "confirmed"
 
 ```ruby
 payments = client.payments.list
+```
+
+#### Check payment status
+
+```ruby
+payment = client.payments.retrieve("payment_abc123")
+puts payment["status"]  # => "confirmed", "pending", "failed"
+```
+
+---
+
+### Subscriptions
+
+#### Approve a subscription
+
+```ruby
+subscription = client.subscriptions.approve(
+  resource_id: "res_abc123",
+  plan_id:     "plan_abc123",
+  payer_wallet: "payer_wallet_address"
+)
+puts subscription["id"]  # => sub_xyz789
+puts subscription["status"]  # => "active"
+```
+
+#### Cancel a subscription
+
+```ruby
+client.subscriptions.cancel("sub_xyz789")
+```
+
+#### List subscriptions
+
+```ruby
+subscriptions = client.subscriptions.list
 ```
 
 ---
@@ -325,10 +471,18 @@ client = Mainlayer::Client.new(api_key: "ml_...", max_retries: 5)
 
 Runnable examples live in the [`examples/`](examples/) directory.
 
+| Example | Description |
+|---------|-------------|
+| `quickstart.rb` | Full end-to-end flow: register → create resource → accept payment → verify access |
+| `vendor_example.rb` | Vendor: create resources, manage plans, webhooks, analytics |
+| `buyer_example.rb` | Buyer: discover resources, accept payment, check entitlements |
+| `subscription_example.rb` | Subscriptions: create plans, approve subscriptions, manage renewals |
+
 ```sh
 MAINLAYER_API_KEY=ml_live_... ruby examples/quickstart.rb
-MAINLAYER_API_KEY=ml_live_... ruby examples/create_resource.rb
-MAINLAYER_API_KEY=ml_live_... RESOURCE_ID=res_xxx ruby examples/pay_for_resource.rb
+MAINLAYER_API_KEY=ml_live_... ruby examples/vendor_example.rb
+MAINLAYER_API_KEY=ml_live_... ruby examples/buyer_example.rb
+MAINLAYER_API_KEY=ml_live_... ruby examples/subscription_example.rb
 ```
 
 ---

@@ -10,6 +10,21 @@ module Mainlayer
     #   response = client.auth.login(email: "me@example.com", password: "s3cr3t")
     #   puts response["access_token"]
     class AuthResource < Resource
+      # Register a new account.
+      #
+      # @param email [String] account email address
+      # @param password [String] account password (minimum 8 characters)
+      # @return [Hash] response containing +:access_token+ and +:user_id+
+      # @raise [Mainlayer::InvalidRequestError] if email or password is invalid
+      #
+      # @example
+      #   result = client.auth.register(email: "newuser@example.com", password: "securepass123")
+      #   token  = result["access_token"]
+      #   user_id = result["user_id"]
+      def register(email:, password:)
+        post("/auth/register", { email: email, password: password })
+      end
+
       # Authenticate with email and password, returning an access token.
       #
       # The returned token can be used as the +api_key+ for subsequent requests.
